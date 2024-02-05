@@ -1,0 +1,15 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Copy py files to live soar app folder",
+            "type": "shell",
+            "command": "cd src; which jq && cp *.py $(echo \"/opt/soar/apps/$(jq .directory $(ls *_connector.py | sed \"s/_connector.py/.json/\") -r)\")/",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}
