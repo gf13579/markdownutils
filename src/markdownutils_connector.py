@@ -189,7 +189,7 @@ class MarkdownUtilsConnector(BaseConnector):
         # For now return Error with a message, in case of success we don't set the message, but use the summary
         return action_result.set_status(phantom.APP_ERROR, "Action not yet implemented")
 
-    def _handle_convert_html_to_markdown(self, param):
+    def _handle_convert_from_html(self, param):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # This comment is a test change.
@@ -240,8 +240,8 @@ class MarkdownUtilsConnector(BaseConnector):
 
         self.debug_print("action_id", self.get_action_identifier())
 
-        if action_id == 'convert_html_to_markdown':
-            ret_val = self._handle_convert_html_to_markdown(param)
+        if action_id == 'convert_from_html':
+            ret_val = self._handle_convert_from_html(param)
 
         if action_id == 'test_connectivity':
             ret_val = self._handle_test_connectivity(param)
