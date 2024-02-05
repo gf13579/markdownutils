@@ -21,7 +21,7 @@ from bs4 import BeautifulSoup
 # Custom module
 import mdutils
 # For debugging
-import sys
+# import sys
 
 
 class RetVal(tuple):
