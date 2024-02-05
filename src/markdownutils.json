@@ -11,7 +11,7 @@
     "product_version_regex": ".*",
     "publisher": "Greg Ford",
     "license": "Copyright (c) Greg Ford, 2024",
-    "app_version": "1.0.4",
+    "app_version": "1.0.5",
     "utctime_updated": "2024-02-05T05:31:39.575162Z",
     "package_name": "phantom_markdownutils",
     "main_module": "markdownutils_connector.py",
@@ -43,7 +43,6 @@
                     "data_type": "string",
                     "required": true,
                     "primary": false,
-                    "contains": [],
                     "value_list": [],
                     "default": "",
                     "order": 0,
@@ -54,7 +53,6 @@
                     "data_type": "boolean",
                     "required": true,
                     "primary": false,
-                    "contains": [],
                     "default": "",
                     "order": 1,
                     "name": "defang_urls"
@@ -64,7 +62,6 @@
                     "data_type": "boolean",
                     "required": true,
                     "primary": false,
-                    "contains": [],
                     "default": "",
                     "order": 2,
                     "name": "render_images_using_vault_items"
@@ -74,7 +71,6 @@
                     "data_type": "numeric",
                     "required": false,
                     "primary": false,
-                    "contains": [],
                     "value_list": [],
                     "default": "",
                     "order": 3,
@@ -124,6 +120,10 @@
                 },
                 {
                     "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
                     "data_type": "string"
                 },
                 {
