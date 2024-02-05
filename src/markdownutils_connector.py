@@ -18,6 +18,12 @@ import requests
 import json
 from bs4 import BeautifulSoup
 
+import re
+# Custom module
+import mdutils
+# For debugging
+import sys
+
 
 class RetVal(tuple):
 
