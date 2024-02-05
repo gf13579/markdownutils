@@ -187,6 +187,8 @@ class MarkdownUtilsConnector(BaseConnector):
     def _handle_convert_html_to_markdown(self, param):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
+        # This comment is a test change.
+
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         html_text = param['html_text']
