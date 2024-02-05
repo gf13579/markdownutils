@@ -18,7 +18,6 @@ import requests
 import json
 from bs4 import BeautifulSoup
 
-import re
 # Custom module
 import mdutils
 # For debugging
@@ -199,17 +198,17 @@ class MarkdownUtilsConnector(BaseConnector):
 
         html_text = param['html_text']
         defang_urls = param['defang_urls']
-        render_images_using_vault_items = param['render_images_using_vault_items']
+        # render_images_using_vault_items = param['render_images_using_vault_items']
 
         container_id = param.get("container_id_with_images", self.get_container_id())
 
         name_to_id_dict = self._get_vault_items(container_id=container_id, action_result=action_result)
 
-        markdown_text = scutils.convert_html_to_md(html_text=html_text, defang_urls=defang_urls)
+        markdown_text = mdutils.convert_html_to_md(html_text=html_text, defang_urls=defang_urls)
         self.save_progress(f"html_text is {html_text}")
         self.save_progress(f"markdown_text is {markdown_text}")
 
-        markdown_text = scutils.translate_img_names_to_ids(markdown_text=markdown_text, name_to_id_dict=name_to_id_dict)
+        markdown_text = mdutils.translate_img_names_to_ids(markdown_text=markdown_text, name_to_id_dict=name_to_id_dict)
 
         # Add the results into the data section
         action_result.add_data({"markdown_text": markdown_text})
@@ -222,7 +221,7 @@ class MarkdownUtilsConnector(BaseConnector):
         # BaseConnector will create a textual message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _get_vault_items(self, action_result, container_id = None):
+    def _get_vault_items(self, action_result, container_id=None):
         if container_id is None:
             container_id = self.get_container_id()
 
@@ -230,9 +229,9 @@ class MarkdownUtilsConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        name_to_id_dict = {item['name']:item["id"] for item in response['data']}
+        name_to_id_dict = {item['name']: item["id"] for item in response['data']}
         return name_to_id_dict
-    
+
     def handle_action(self, param):
         ret_val = phantom.APP_SUCCESS
 
