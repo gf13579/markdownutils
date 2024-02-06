@@ -4,7 +4,7 @@
         {
             "label": "Copy py files to live soar app folder",
             "type": "shell",
-            "command": "cd src; which jq && cp *.py $(echo \"/opt/soar/apps/$(jq .directory $(ls *_connector.py | sed \"s/_connector.py/.json/\") -r)\")/",
+            "command": "which jq && cd src; appjson=$(ls *_connector.py | sed \"s/_connector.py/.json/\"); appname=$(ls *_connector.py | sed \"s/_connector.py//\"); appid=$(jq -r '.appid' $appjson); cp *.py \"/opt/soar/apps/${appname}_${appid}\"",
             "problemMatcher": [],
             "group": {
                 "kind": "build",

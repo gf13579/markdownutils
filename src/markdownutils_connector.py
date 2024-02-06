@@ -20,10 +20,9 @@ from bs4 import BeautifulSoup
 
 # Custom module
 import mdutils
+
 # For debugging
 # import sys
-
-this is a bug
 
 
 class RetVal(tuple):
@@ -53,7 +52,8 @@ class MarkdownUtilsConnector(BaseConnector):
         return RetVal(
             action_result.set_status(
                 phantom.APP_ERROR, "Empty response and no information in the header"
-            ), None
+            ),
+            None,
         )
 
     def _process_html_response(self, response, action_result):
@@ -63,15 +63,17 @@ class MarkdownUtilsConnector(BaseConnector):
         try:
             soup = BeautifulSoup(response.text, "html.parser")
             error_text = soup.text
-            split_lines = error_text.split('\n')
+            split_lines = error_text.split("\n")
             split_lines = [x.strip() for x in split_lines if x.strip()]
-            error_text = '\n'.join(split_lines)
+            error_text = "\n".join(split_lines)
         except:
             error_text = "Cannot parse error details"
 
-        message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, error_text)
+        message = "Status Code: {0}. Data from server:\n{1}\n".format(
+            status_code, error_text
+        )
 
-        message = message.replace(u'{', '{{').replace(u'}', '}}')
+        message = message.replace("{", "{{").replace("}", "}}")
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _process_json_response(self, r, action_result):
@@ -81,8 +83,10 @@ class MarkdownUtilsConnector(BaseConnector):
         except Exception as e:
             return RetVal(
                 action_result.set_status(
-                    phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(str(e))
-                ), None
+                    phantom.APP_ERROR,
+                    "Unable to parse JSON response. Error: {0}".format(str(e)),
+                ),
+                None,
             )
 
         # Please specify the status codes here
@@ -91,30 +95,29 @@ class MarkdownUtilsConnector(BaseConnector):
 
         # You should process the error returned in the json
         message = "Error from server. Status Code: {0} Data from server: {1}".format(
-            r.status_code,
-            r.text.replace(u'{', '{{').replace(u'}', '}}')
+            r.status_code, r.text.replace("{", "{{").replace("}", "}}")
         )
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _process_response(self, r, action_result):
         # store the r_text in debug data, it will get dumped in the logs if the action fails
-        if hasattr(action_result, 'add_debug_data'):
-            action_result.add_debug_data({'r_status_code': r.status_code})
-            action_result.add_debug_data({'r_text': r.text})
-            action_result.add_debug_data({'r_headers': r.headers})
+        if hasattr(action_result, "add_debug_data"):
+            action_result.add_debug_data({"r_status_code": r.status_code})
+            action_result.add_debug_data({"r_text": r.text})
+            action_result.add_debug_data({"r_headers": r.headers})
 
         # Process each 'Content-Type' of response separately
 
         # Process a json response
-        if 'json' in r.headers.get('Content-Type', ''):
+        if "json" in r.headers.get("Content-Type", ""):
             return self._process_json_response(r, action_result)
 
         # Process an HTML response, Do this no matter what the api talks.
         # There is a high chance of a PROXY in between phantom and the rest of
         # world, in case of errors, PROXY's return HTML, this function parses
         # the error and adds it to the action_result.
-        if 'html' in r.headers.get('Content-Type', ''):
+        if "html" in r.headers.get("Content-Type", ""):
             return self._process_html_response(r, action_result)
 
         # it's not content-type that is to be parsed, handle an empty response
@@ -123,8 +126,7 @@ class MarkdownUtilsConnector(BaseConnector):
 
         # everything else is actually an error at this point
         message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(
-            r.status_code,
-            r.text.replace('{', '{{').replace('}', '}}')
+            r.status_code, r.text.replace("{", "{{").replace("}", "}}")
         )
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
@@ -140,8 +142,10 @@ class MarkdownUtilsConnector(BaseConnector):
             request_func = getattr(requests, method)
         except AttributeError:
             return RetVal(
-                action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)),
-                resp_json
+                action_result.set_status(
+                    phantom.APP_ERROR, "Invalid method: {0}".format(method)
+                ),
+                resp_json,
             )
 
         # Create a URL to connect to
@@ -151,14 +155,16 @@ class MarkdownUtilsConnector(BaseConnector):
             r = request_func(
                 url,
                 # auth=(username, password),  # basic authentication
-                verify=config.get('verify_server_cert', False),
-                **kwargs
+                verify=config.get("verify_server_cert", False),
+                **kwargs,
             )
         except Exception as e:
             return RetVal(
                 action_result.set_status(
-                    phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(str(e))
-                ), resp_json
+                    phantom.APP_ERROR,
+                    "Error Connecting to server. Details: {0}".format(str(e)),
+                ),
+                resp_json,
             )
 
         return self._process_response(r, action_result)
@@ -172,10 +178,9 @@ class MarkdownUtilsConnector(BaseConnector):
         # Also typically it does not add any data into an action_result either.
         # The status and progress messages are more important.
 
-        self.save_progress("Connecting to endpoint")
         # make rest call
         ret_val, response = self._make_rest_call(
-            '/endpoint', action_result, params=None, headers=None
+            "/endpoint", action_result, params=None, headers=None
         )
 
         if phantom.is_fail(ret_val):
@@ -192,25 +197,38 @@ class MarkdownUtilsConnector(BaseConnector):
         return action_result.set_status(phantom.APP_ERROR, "Action not yet implemented")
 
     def _handle_convert_from_html(self, param):
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
-
-        # This comment is a test change.
+        self.save_progress(
+            "In action handler for: {0}".format(self.get_action_identifier())
+        )
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        html_text = param['html_text']
-        defang_urls = param['defang_urls']
+        html_text = param["html_text"]
+        defang_urls = param["defang_urls"]
+
         # render_images_using_vault_items = param['render_images_using_vault_items']
 
         container_id = param.get("container_id_with_images", self.get_container_id())
 
-        name_to_id_dict = self._get_vault_items(container_id=container_id, action_result=action_result)
+        try:
+            name_to_id_dict = self._get_vault_items(
+                container_id=container_id, action_result=action_result
+            )
+        except Exception as e:
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                f"Error getting vault items. Error: {str(e)}",
+            )
 
-        markdown_text = mdutils.convert_html_to_md(html_text=html_text, defang_urls=defang_urls)
+        markdown_text = mdutils.convert_html_to_md(
+            html_text=html_text, defang_urls=defang_urls
+        )
         self.save_progress(f"html_text is {html_text}")
         self.save_progress(f"markdown_text is {markdown_text}")
 
-        markdown_text = mdutils.translate_img_names_to_ids(markdown_text=markdown_text, name_to_id_dict=name_to_id_dict)
+        markdown_text = mdutils.translate_img_names_to_ids(
+            markdown_text=markdown_text, name_to_id_dict=name_to_id_dict
+        )
 
         # Add the results into the data section
         action_result.add_data({"markdown_text": markdown_text})
@@ -227,11 +245,15 @@ class MarkdownUtilsConnector(BaseConnector):
         if container_id is None:
             container_id = self.get_container_id()
 
-        ret_val, response = self._make_rest_call(f'/rest/container_attachment?_filter_container={container_id}&page_size=0', action_result)
+        ret_val, response = self._make_rest_call(
+            f"/rest/container_attachment?_filter_container={container_id}&page_size=0",
+            action_result,
+        )
+
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        name_to_id_dict = {item['name']: item["id"] for item in response['data']}
+        name_to_id_dict = {item["name"]: item["id"] for item in response["data"]}
         return name_to_id_dict
 
     def handle_action(self, param):
@@ -242,10 +264,10 @@ class MarkdownUtilsConnector(BaseConnector):
 
         self.debug_print("action_id", self.get_action_identifier())
 
-        if action_id == 'convert_from_html':
+        if action_id == "convert_from_html":
             ret_val = self._handle_convert_from_html(param)
 
-        if action_id == 'test_connectivity':
+        if action_id == "test_connectivity":
             ret_val = self._handle_test_connectivity(param)
 
         return ret_val
@@ -267,7 +289,8 @@ class MarkdownUtilsConnector(BaseConnector):
         optional_config_name = config.get('optional_config_name')
         """
 
-        self._base_url = config.get('base_url')
+        # self._base_url = config.get("base_url")
+        self._base_url = BaseConnector._get_phantom_base_url()
 
         return phantom.APP_SUCCESS
 
@@ -282,9 +305,9 @@ def main():
 
     argparser = argparse.ArgumentParser()
 
-    argparser.add_argument('input_test_json', help='Input Test JSON file')
-    argparser.add_argument('-u', '--username', help='username', required=False)
-    argparser.add_argument('-p', '--password', help='password', required=False)
+    argparser.add_argument("input_test_json", help="Input Test JSON file")
+    argparser.add_argument("-u", "--username", help="username", required=False)
+    argparser.add_argument("-p", "--password", help="password", required=False)
 
     args = argparser.parse_args()
     session_id = None
@@ -296,28 +319,29 @@ def main():
 
         # User specified a username but not a password, so ask
         import getpass
+
         password = getpass.getpass("Password: ")
 
     if username and password:
         try:
-            login_url = MarkdownUtilsConnector._get_phantom_base_url() + '/login'
+            login_url = MarkdownUtilsConnector._get_phantom_base_url() + "/login"
 
             print("Accessing the Login page")
             r = requests.get(login_url, verify=False)
-            csrftoken = r.cookies['csrftoken']
+            csrftoken = r.cookies["csrftoken"]
 
             data = dict()
-            data['username'] = username
-            data['password'] = password
-            data['csrfmiddlewaretoken'] = csrftoken
+            data["username"] = username
+            data["password"] = password
+            data["csrfmiddlewaretoken"] = csrftoken
 
             headers = dict()
-            headers['Cookie'] = 'csrftoken=' + csrftoken
-            headers['Referer'] = login_url
+            headers["Cookie"] = "csrftoken=" + csrftoken
+            headers["Referer"] = login_url
 
             print("Logging into Platform to get the session id")
             r2 = requests.post(login_url, verify=False, data=data, headers=headers)
-            session_id = r2.cookies['sessionid']
+            session_id = r2.cookies["sessionid"]
         except Exception as e:
             print("Unable to get session id from the platform. Error: " + str(e))
             exit(1)
@@ -331,8 +355,8 @@ def main():
         connector.print_progress_message = True
 
         if session_id is not None:
-            in_json['user_session_token'] = session_id
-            connector._set_csrf_info(csrftoken, headers['Referer'])
+            in_json["user_session_token"] = session_id
+            connector._set_csrf_info(csrftoken, headers["Referer"])
 
         ret_val = connector._handle_action(json.dumps(in_json), None)
         print(json.dumps(json.loads(ret_val), indent=4))
@@ -340,5 +364,5 @@ def main():
     exit(0)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
