@@ -30,28 +30,28 @@ def convert_html_to_md(
     if defang_urls:
         # insert X into the middle of uri handlers of 2+ chars - and bracket the first dot of the fqdn
         html_text = re.sub(
-            "(\w)\w(\w*):\/\/([^\.]+)\.",
+            r"(\w)\w(\w*):\/\/([^\.]+)\.",
             r"\1X\2://\3[.]",
             html_text,
             flags=re.IGNORECASE,
         )
         # replace single-char URI handlers with X - and bracket the first dot of the fqdn
         html_text = re.sub(
-            "(^|\W)\w:\/\/([^\.]+)\.", r"\1X://\2[.]", html_text, flags=re.IGNORECASE
+            r"(^|\W)\w:\/\/([^\.]+)\.", r"\1X://\2[.]", html_text, flags=re.IGNORECASE
         )
         # deal with www explicitly
-        html_text = re.sub("www\.", "wXw[.]", html_text, flags=re.IGNORECASE)
+        html_text = re.sub(r"www\.", r"wXw[.]", html_text, flags=re.IGNORECASE)
 
     if strip_comments:
         html_text = re.sub(
-            pattern="<!--.*?-->", repl="", string=html_text, flags=re.DOTALL
+            pattern=r"<!--.*?-->", repl=r"", string=html_text, flags=re.DOTALL
         )
 
     markdown_text = md(html_text)
 
     if defang_mailto:
         markdown_text = re.sub(
-            pattern="mailto:", repl="mailXXto:", string=markdown_text
+            pattern=r"mailto:", repl=r"mailXXto:", string=markdown_text
         )
 
     return markdown_text
